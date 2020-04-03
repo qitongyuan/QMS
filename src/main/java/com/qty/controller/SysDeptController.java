@@ -30,40 +30,27 @@ public class SysDeptController {
     @PostMapping("/deptList")
     public BaseResponse deptList(@RequestBody SysDept sysDept){
         BaseResponse response=new BaseResponse(StatusCode.Success);
-        response.setData(sysDeptService.selectDeptList(sysDept));
+        List<SysDept>depts=Lists.newArrayList();
+        try {
+            depts=sysDeptService.selectDeptList(sysDept);
+        }catch (Exception e){
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        response.setData(depts);
         return response;
     }
 
-    /**
-     * 由前端转化成tree型结构
-     *
-     * @return
-     */
-    @ApiOperation(value = "部门列表展示", notes = "部门列表展示")
-    @GetMapping("/list")
-    public List<SysDept> list() {
-        return sysDeptService.queryAll(Maps.newHashMap());
-    }
-
-    /**
-     * 不同的返回类型
-     *
-     * @return
-     */
-    @ApiOperation(value = "部门树展示", notes = "部门树展示")
-    @GetMapping("/tree")
-    public BaseResponse selectTree() {
-        BaseResponse response = new BaseResponse(StatusCode.Success);
-        Map<String, Object> resMap = Maps.newHashMap();
-        List<SysDept> deptList = Lists.newLinkedList();
+    @ApiOperation(value = "部门树勾选数据", notes = "部门树勾选数据")
+    @GetMapping("/roleDeptData")
+    public BaseResponse getRoleDept(@RequestParam Long roleId){
+        BaseResponse response=new BaseResponse(StatusCode.Success);
+        List<Long>deptIds=Lists.newArrayList();
         try {
-            deptList = sysDeptService.queryAll(Maps.newHashMap());
-
-        } catch (Exception e) {
-            response = new BaseResponse(StatusCode.Fail.getCode(), e.getMessage());
+            deptIds=sysDeptService.roleDeptData(roleId);
+        }catch (Exception e){
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
         }
-        resMap.put("deptList", deptList);
-        response.setData(resMap);
+        response.setData(deptIds);
         return response;
     }
 
@@ -84,19 +71,20 @@ public class SysDeptController {
         return response;
     }
 
-    @ApiOperation(value = "获取部门详情", notes = "获取部门详情")
-    @GetMapping("/detail/{deptId}")
-    public BaseResponse detail(@PathVariable Long deptId){
-        BaseResponse response=new BaseResponse(StatusCode.Success);
-        Map<String,Object>resMap=Maps.newHashMap();
-        try{
-            resMap.put("dept",sysDeptService.getById(deptId));
-        }catch (Exception e){
-            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
-        }
-        response.setData(resMap);
-        return response;
-    }
+//    不需要，前端直接显示
+//    @ApiOperation(value = "获取部门详情", notes = "获取部门详情")
+//    @GetMapping("/detail/{deptId}")
+//    public BaseResponse detail(@PathVariable Long deptId){
+//        BaseResponse response=new BaseResponse(StatusCode.Success);
+//        Map<String,Object>resMap=Maps.newHashMap();
+//        try{
+//            resMap.put("dept",sysDeptService.getById(deptId));
+//        }catch (Exception e){
+//            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+//        }
+//        response.setData(resMap);
+//        return response;
+//    }
 
     @ApiOperation(value = "修改部门", notes = "修改部门")
     @PostMapping(value = "/update")

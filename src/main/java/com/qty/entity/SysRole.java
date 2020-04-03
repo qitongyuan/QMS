@@ -29,9 +29,15 @@ public class SysRole implements Serializable {
      */
     private String dataScope;
 
+    /**
+     * 菜单组
+     */
     @TableField(exist=false)
     private List<Long> menuIdList;
 
+    /**
+     * 部门组
+     */
     @TableField(exist=false)
     private List<Long> deptIdList;
 

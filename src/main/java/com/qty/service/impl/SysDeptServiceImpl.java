@@ -27,48 +27,6 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     @Resource
     private SysDeptMapper sysDeptMapper;
 
-
-    /**
-     * 将ID列表转化成id拼接成的字符串
-     * @return
-     */
-    public String getCurrUserDataDeptIdsStr() {
-        String result=null;
-        Set<Long> dataSet=this.getCurrUserDataDeptId();
-        if (dataSet!=null && !dataSet.isEmpty()){
-            result= CommonUtil.concatStrToInt(Joiner.on(",").join(dataSet),",");
-        }
-
-        return result;
-    }
-
-
-    /**
-     * 获取当前登录用户的部门ID
-     * @return
-     */
-    @Override
-    public Set<Long> getCurrUserDataDeptId() {
-        Set<Long> dataIds= Sets.newHashSet();
-        SysUser currUser=ShiroUtil.getUserInfo();
-        if (ConstantParameter.SUPER_ADMIN==currUser.getUserId()){
-            //管理员查询所有的部门ID
-            dataIds=sysDeptMapper.queryAllDeptIds();
-        }else {
-            //分配给普通用户的部门数据权限
-            Set<Long> userDeptDataIds=sysDeptMapper.queryDeptIdsByUserId(currUser.getUserId());
-            if (userDeptDataIds!=null&&!userDeptDataIds.isEmpty()){
-                dataIds.addAll(userDeptDataIds);
-            }
-            //用户所在的部门以及子部门数据权限
-            dataIds.add(currUser.getDeptId());
-            List<Long> subDeptIdList=this.getSubDeptIdList(currUser.getDeptId());
-            dataIds.addAll(Sets.newHashSet(subDeptIdList));
-
-        }
-        return dataIds;
-    }
-
     /**
      * 查询子部门id列表
      * @param deptId
@@ -102,22 +60,14 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         }
     }
 
-    @Override
-    public List<SysDept> queryAll(Map<String, Object> map) {
-        //如果不是超管，则走if里的逻辑
-        if (ShiroUtil.getUserInfo().getUserId()!= ConstantParameter.SUPER_ADMIN){
-            //获取当前用户所属的的部门ID
-            String deptDataIds=this.getCurrUserDataDeptIdsStr();
-            map.put("deptDataIds",(StringUtils.isNotBlank(deptDataIds))?deptDataIds:null);
-        }
-        return sysDeptMapper.queryListIn(map);
-    }
-
-    //===========================================新
-
     @DataScope(deptAlias = "td")
     @Override
     public List<SysDept> selectDeptList(SysDept dept) {
         return sysDeptMapper.selectDeptList(dept);
+    }
+
+    @Override
+    public List<Long> roleDeptData(Long roleId) {
+        return sysDeptMapper.selectRoleDeptById(roleId);
     }
 }

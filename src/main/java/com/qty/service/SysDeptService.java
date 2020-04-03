@@ -10,17 +10,16 @@ import java.util.Set;
 
 public interface SysDeptService extends IService<SysDept> {
 
-    //获取当前登录用户的部门数据ID列表
-    public Set<Long>getCurrUserDataDeptId();
 
-    //获取子节点的id列表
+    //根据部门ID获取子节点的id列表
     List<Long>getSubDeptIdList(Long deptId);
 
-
-    //获取部门列表
-    List<SysDept> queryAll(Map<String,Object> map);
-
-    //================新
+    //查询部门管理列表（根据注解分数据权限权限）
     List<SysDept>selectDeptList(SysDept dept);
+
+    //获得已经勾选的部门id
+    List<Long>roleDeptData(Long roleId);
+
+
 
 }

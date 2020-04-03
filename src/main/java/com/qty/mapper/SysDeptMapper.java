@@ -20,6 +20,9 @@ public interface SysDeptMapper extends BaseMapper<SysDept> {
     //根据父级部门id查询子部门id列表
     List<Long> queryDeptIds(Long parentId);
 
-    //==============================新
+    //获取部门列表（具有数据权限判断）
     List<SysDept>selectDeptList(SysDept dept);
+
+    //根据角色ID获取对应选中的部门ID
+    List<Long>selectRoleDeptById(Long roleId);
 }
