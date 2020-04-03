@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qty.mapper.SysDeptMapper">
+
+    <select id="queryListIn" resultType="com.qty.entity.SysDept">
+        SELECT
+        t1.*,
+        (SELECT t2.name
+        FROM tb_dept t2
+        WHERE t2.dept_id = t1.parent_id) parentName
+        FROM tb_dept t1
+        WHERE t1.del_flag = 0
+
+        <if test="deptDataIds !=null and deptDataIds!='' ">
+            AND t1.dept_id IN (${deptDataIds})
+        </if>
+
+    </select>
+
+    <select id="queryAllDeptIds" resultType="long">
+        SELECT dept_id
+		FROM tb_dept
+		WHERE del_flag = 0
+    </select>
+
+    <select id="queryDeptIdsByUserId" resultType="long">
+		SELECT roleDept.dept_id
+		FROM tb_role_dept AS roleDept
+		  LEFT JOIN tb_user_role AS userRole ON userRole.role_id = roleDept.role_id
+		WHERE userRole.user_id = #{userId}
+	</select>
+
+    <select id="queryDeptIds" resultType="long">
+		SELECT dept_id
+		FROM tb_dept
+		WHERE del_flag = 0 AND parent_id = #{parentId}
+	</select>
+
+    <!--查询部门列表-->
+    <select id="selectDeptList" parameterType="com.qty.entity.SysDept" resultType="com.qty.entity.SysDept">
+        select td.*, (SELECT t2.name FROM tb_dept t2 WHERE t2.dept_id = td.parent_id) parentName
+         from tb_dept td
+        where td.del_flag=0
+        <if test="name!=null and name!=''">
+            AND name like concat('%', #{name}, '%')
+        </if>
+        ${params.dataScope}
+        order by td.parent_id,td.order_num
+    </select>
+
+</mapper>

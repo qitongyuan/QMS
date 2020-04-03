@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qty.mapper.SysRoleMapper">
+
+    <select id="getRolesById" parameterType="long" resultType="com.qty.entity.SysRole">
+        SELECT * FROM tb_role tr
+            LEFT JOIN tb_user_role tur ON tur.role_id=tr.role_id
+                WHERE tur.user_id=#{userId}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,29 @@
+server:
+  port: 8888
+  error:
+    include-exception: true
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/vblog?serverTimezone=UTC
+    username: root
+    password: root
+  cache:
+    type: redis
+  redis:
+    host: 119.23.109.216
+    port: 6379
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1
+        min-idle: 0
+    timeout: 1000
+    database: 0
+mybatis-plus:
+  type-aliases-package: com.qty.entity
+  mapper-locations: classpath:mappers/*.xml
+configuration:
+                log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
