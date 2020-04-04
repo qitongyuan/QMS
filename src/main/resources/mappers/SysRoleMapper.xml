@@ -9,5 +9,15 @@
                 WHERE tur.user_id=#{userId}
     </select>
 
+    <select id="checkRoleNameUnique" parameterType="string" resultType="com.qty.entity.SysRole">
+        select * from tb_role tr
+            where tr.role_name=#{roleName}
+    </select>
+
+    <select id="checkRoleKeyUnique" parameterType="string" resultType="com.qty.entity.SysRole">
+        select * from tb_role tr
+            where tr.role_key=#{roleKey}
+    </select>
+
 
 </mapper>

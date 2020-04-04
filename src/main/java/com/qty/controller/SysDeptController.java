@@ -57,6 +57,7 @@ public class SysDeptController {
     @ApiOperation(value = "部门新增", notes = "部门新增")
     @PostMapping(value = "/save")
     public BaseResponse save(@RequestBody @Validated SysDept sysDept, BindingResult result) {
+
         //校验工具做校验
         String res = ValidatorUtil.checkResult(result);
         if (StringUtils.isNotBlank(res)){

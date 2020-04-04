@@ -1,18 +1,20 @@
 package com.qty.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @TableName("tb_post")
-public class SysPost {
+public class SysPost implements Serializable {
 
-    @TableId
+    @TableId(value = "post_id",type = IdType.AUTO)
     private Long postId;
 
     @NotBlank(message = "岗位编码不能为空!")
