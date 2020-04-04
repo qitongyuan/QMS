@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 实体类的基类
+ */
 @Data
 public class BaseEntity implements Serializable {
 

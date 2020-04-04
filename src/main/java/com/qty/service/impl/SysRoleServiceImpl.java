@@ -3,8 +3,11 @@ package com.qty.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.qty.entity.SysRole;
+import com.qty.entity.SysRoleDept;
 import com.qty.entity.SysRoleMenu;
+import com.qty.mapper.SysRoleDeptMapper;
 import com.qty.mapper.SysRoleMapper;
 import com.qty.mapper.SysRoleMenuMapper;
 import com.qty.service.SysRoleService;
@@ -29,6 +32,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper,SysRole> imple
 
     @Resource
     private SysRoleMenuMapper sysRoleMenuMapper;
+
+    @Resource
+    private SysRoleDeptMapper sysRoleDeptMapper;
 
     @Override
     public List<SysRole> getRolesById(Long userId) {
@@ -101,7 +107,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper,SysRole> imple
     }
 
     /**
-     * 新增角色菜单信息
+     * 新增角色菜单信息（菜单权限）
      * @param role
      * @return
      */
@@ -121,6 +127,27 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper,SysRole> imple
         return rows;
     }
 
+    /**
+     * 新增角色部门信息（数据权限）
+     * @param role
+     * @return
+     */
+    public int insertRoleDept(SysRole role){
+        int rows=1;
+        List<SysRoleDept>sysRoleDepts= Lists.newArrayList();
+        for (Long deptId:role.getDeptIdList()) {
+            SysRoleDept rd = new SysRoleDept();
+            rd.setRoleId(role.getRoleId());
+            rd.setDeptId(deptId);
+            sysRoleDepts.add(rd);
+        }
+        if (sysRoleDepts.size()>0){
+            rows=sysRoleDeptMapper.insertBatch(sysRoleDepts);
+        }
+        return rows;
+    }
+
+
     @Transactional
     @Override
     public boolean updateRole(SysRole role) {
@@ -139,6 +166,21 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper,SysRole> imple
     public void checkRoleAllowed(SysRole role) {
         if (com.qty.util.StringUtils.isNotNull(role.getRoleId())&&role.isAdmin()){
             throw new RuntimeException("超管不允许被操作");
+        }
+    }
+
+    @Transactional
+    @Override
+    public boolean authDataScope(SysRole role) {
+        //修改角色信息（主要修改角色对应的DataScope）
+        this.updateById(role);
+        //删除角色与部门的关联信息
+        sysRoleDeptMapper.deleteRoleDeptByRoleId(role.getRoleId());
+        //维护新的角色部门信息（如若自定义数据权限则插入有值，如若其他则不对其做修改）
+        if (insertRoleDept(role)>0){
+            return true;
+        }else {
+            return false;
         }
     }
 }

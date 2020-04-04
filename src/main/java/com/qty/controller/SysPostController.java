@@ -102,10 +102,10 @@ public class SysPostController {
 
     @ApiOperation(value = "岗位删除")
     @RequestMapping(value = "/delete",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public BaseResponse delete(@RequestBody Long[] ids){
+    public BaseResponse delete(@RequestBody String ids){
         BaseResponse response=new BaseResponse(StatusCode.Success);
         try {
-            sysPostService.removeByIds(Arrays.asList(ids));
+            sysPostService.removeByIds(Arrays.asList(ids.split(",")));
         }catch (Exception e){
             response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
         }

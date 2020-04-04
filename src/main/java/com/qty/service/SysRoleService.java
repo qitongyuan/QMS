@@ -29,4 +29,7 @@ public interface SysRoleService extends IService<SysRole> {
 
     //判断该角色是否是超管，超管不允许被操作
     public void checkRoleAllowed(SysRole role);
+
+    //赋予数据权限
+    public boolean authDataScope(SysRole role);
 }

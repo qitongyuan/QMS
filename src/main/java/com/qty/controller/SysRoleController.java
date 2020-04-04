@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Map;
 
 
@@ -49,7 +50,7 @@ public class SysRoleController {
      * @param role
      * @return
      */
-    @ApiOperation(value = "角色新增", notes = "角色新增")
+    @ApiOperation(value = "角色菜单权限新增", notes = "角色菜单权限新增")
     @PostMapping("/add")
     public BaseResponse add(@RequestBody @Validated SysRole role, BindingResult result){
         BaseResponse response=new BaseResponse(StatusCode.Success);
@@ -80,6 +81,7 @@ public class SysRoleController {
     /**
      * 角色修改
      */
+    @ApiOperation(value = "编辑角色与菜单权限", notes = "编辑角色与菜单权限")
     @PostMapping("/update")
     public BaseResponse updateRole(@Validated SysRole role,BindingResult result){
         //不允许操作超级管理的角色
@@ -98,17 +100,53 @@ public class SysRoleController {
         if (!sysRoleService.checkRoleKeyUnique(role)){
             throw new RuntimeException("角色编码重复");
         }
-        //TODO 修改完角色后是否需推出登录（后续完成）
+        //TODO 修改完角色后是否需退出登录（后续完成）
         try {
             boolean flag= sysRoleService.updateRole(role);
             if (!flag){
                 throw new RuntimeException("角色修改失败");
             }
         } catch (Exception e) {
-            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());;
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
         }
         return response;
     }
 
+    @ApiOperation(value = "删除角色", notes = "删除角色")
+    @PostMapping("/delete")
+    public BaseResponse delete(String ids){
+        BaseResponse response=new BaseResponse(StatusCode.Success);
+        try {
+            sysRoleService.removeByIds(Arrays.asList(ids.split(",")));
+        }catch (Exception e){
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+
+        return response;
+    }
+
+
+    /**
+     * 给角色分配数据权限
+     * @param role
+     * @return
+     */
+    @ApiOperation(value = "编辑角色数据权限", notes = "编辑角色数据权限")
+    @PostMapping("/authDataScope")
+    public BaseResponse authDataScopeSave(SysRole role){
+        BaseResponse response=new BaseResponse(StatusCode.Success);
+        //检验是否为超管用户，超管用户不能分配数据权限
+        sysRoleService.checkRoleAllowed(role);
+        try {
+            boolean flag=sysRoleService.authDataScope(role);
+            if (!flag){
+                throw new RuntimeException("数据权限编辑失败");
+            }
+        } catch (Exception e) {
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        return response;
+    }
 
 }
+

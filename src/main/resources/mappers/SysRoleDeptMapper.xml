@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qty.mapper.SysRoleDeptMapper">
+    <delete id="deleteRoleDeptByRoleId" parameterType="long">
+        delete from tb_role_dept where role_id=#{roleId}
+    </delete>
+
+    <insert id="insertBatch">
+        insert into tb_role_dept(role_id, dept_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.roleId},#{item.deptId})
+        </foreach>
+    </insert>
+
+</mapper>
