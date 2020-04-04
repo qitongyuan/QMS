@@ -120,4 +120,25 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper,SysRole> imple
         }
         return rows;
     }
+
+    @Transactional
+    @Override
+    public boolean updateRole(SysRole role) {
+        //根据角色ID进行更新
+        this.updateById(role);
+        //级联删除所有菜单
+        sysRoleMenuMapper.deleteRoleMenuByRoleId(role.getRoleId());
+        if (insertRoleMenu(role)>0){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    @Override
+    public void checkRoleAllowed(SysRole role) {
+        if (com.qty.util.StringUtils.isNotNull(role.getRoleId())&&role.isAdmin()){
+            throw new RuntimeException("超管不允许被操作");
+        }
+    }
 }

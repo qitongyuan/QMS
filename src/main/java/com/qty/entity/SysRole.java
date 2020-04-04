@@ -48,4 +48,12 @@ public class SysRole implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
+    public boolean isAdmin(){
+        return isAdmin(this.roleId);
+    }
+    public static boolean isAdmin(Long roleId)
+    {
+        return roleId != null && 1L == roleId;
+    }
+
 }

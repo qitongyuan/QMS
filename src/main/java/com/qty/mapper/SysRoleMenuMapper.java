@@ -10,4 +10,7 @@ import java.util.List;
 public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
 
     int insertBatch(List<SysRoleMenu>roleMenuList);
+
+    //通过角色ID删除所有的关联菜单
+    int deleteRoleMenuByRoleId(Long roleId);
 }

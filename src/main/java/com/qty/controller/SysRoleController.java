@@ -77,5 +77,38 @@ public class SysRoleController {
         return response;
     }
 
+    /**
+     * 角色修改
+     */
+    @PostMapping("/update")
+    public BaseResponse updateRole(@Validated SysRole role,BindingResult result){
+        //不允许操作超级管理的角色
+        sysRoleService.checkRoleAllowed(role);
+        BaseResponse response=new BaseResponse(StatusCode.Success);
+        //校验用户输入不为空
+        String res = ValidatorUtil.checkResult(result);
+        if (StringUtils.isNotBlank(res)){
+            return new BaseResponse(StatusCode.Fail.getCode(),res);
+        }
+
+        //判断角色名是否重复
+        if (!sysRoleService.checkRoleNameUnique(role)){
+            throw new RuntimeException("角色名重复");
+        }
+        if (!sysRoleService.checkRoleKeyUnique(role)){
+            throw new RuntimeException("角色编码重复");
+        }
+        //TODO 修改完角色后是否需推出登录（后续完成）
+        try {
+            boolean flag= sysRoleService.updateRole(role);
+            if (!flag){
+                throw new RuntimeException("角色修改失败");
+            }
+        } catch (Exception e) {
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());;
+        }
+        return response;
+    }
+
 
 }

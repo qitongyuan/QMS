@@ -16,5 +16,6 @@ public interface UserMapper extends BaseMapper<SysUser> {
     //根据用户ID查询该用户的所有权限
     List<String> queryAllPerms(Long userId);
 
+    //根据用户ID查找该用户的所有角色
     List<String>queryAllRoles(Long userId);
 }

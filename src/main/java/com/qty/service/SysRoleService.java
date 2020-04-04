@@ -23,4 +23,10 @@ public interface SysRoleService extends IService<SysRole> {
 
     //新增角色信息（维护菜单信息）
     public boolean insertRole(SysRole role);
+
+    //修改角色（修改完角色删除所有关联的菜单）
+    public boolean updateRole(SysRole role);
+
+    //判断该角色是否是超管，超管不允许被操作
+    public void checkRoleAllowed(SysRole role);
 }
