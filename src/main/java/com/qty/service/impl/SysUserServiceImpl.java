@@ -105,7 +105,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     //还要求分页
     @Override
     @DataScope(deptAlias = "td",userAlias = "tu")
-    public PageUtil queryPageByRoleId(Map<String, Object> params) {
+    public PageUtil queryPageAuthByRoleId(Map<String, Object> params) {
         //搜索框
         String search= (params.get("search") == null)? "": params.get("search").toString();
         params.put("search",search);
@@ -122,6 +122,29 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         List<SysUser>sysUsers= sysUserMapper.queryAllAuthUserByRoleId(params);
         //查询满足条件的记录数
         int countAll=sysUserMapper.queryAllAuthUserCountByRoleId(params);
+        return new PageUtil(sysUsers,countAll,pageSize,currPage);
+    }
+
+    //查询还未分配过该角色的用户
+    @Override
+    @DataScope(deptAlias = "td",userAlias = "tu")
+    public PageUtil queryPageUnAuthByRoleId(Map<String, Object> params) {
+        //搜索框
+        String search= (params.get("search") == null)? "": params.get("search").toString();
+        params.put("search",search);
+        //角色ID
+        Long roleId=(params.get("roleId") == null)? -1L: Long.parseLong(params.get("roleId").toString());
+        params.put("roleId",roleId);
+        //取当前页
+        int currPage=(params.get("page") == null)? 1: Integer.parseInt(params.get("page").toString());
+        params.put("page",currPage-1);
+        //取页容量
+        int pageSize=(params.get("limit") == null)? 10: Integer.parseInt(params.get("limit").toString());
+        params.put("limit",pageSize);
+        //查询数据
+        List<SysUser>sysUsers= sysUserMapper.queryAllUnAuthUserByRoleId(params);
+        //查询记录数
+        int countAll=sysUserMapper.queryAllUnAuthUserCountByRoleId(params);
         return new PageUtil(sysUsers,countAll,pageSize,currPage);
     }
 }

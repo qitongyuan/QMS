@@ -25,4 +25,8 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     List<SysUser>queryAllAuthUserByRoleId(Map<String, Object> params);
 
     int queryAllAuthUserCountByRoleId(Map<String, Object> params);
+
+    List<SysUser>queryAllUnAuthUserByRoleId(Map<String, Object> params);
+
+    int queryAllUnAuthUserCountByRoleId(Map<String, Object> params);
 }

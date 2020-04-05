@@ -3,6 +3,7 @@
 
 <mapper namespace="com.qty.mapper.SysUserMapper">
 
+	<!--菜单标识-->
     <select id="queryAllPerms" resultType="string">
 		select m.perms from tb_user_role ur
 			LEFT JOIN tb_role_menu rm on ur.role_id = rm.role_id
@@ -10,8 +11,9 @@
 		where ur.user_id = #{userId}
     </select>
 
+	<!--角色标识-->
 	<select id="queryAllRoles" resultType="string">
-		SELECT r.role_name from tb_user_role ur
+		SELECT r.role_key from tb_user_role ur
 			LEFT JOIN tb_role r ON r.role_id=ur.role_id
 	</select>
 
@@ -40,4 +42,32 @@
 		${dataScope}
      </select>
 
-        </mapper>
+	<!--新增角色用户时查询未添加过该角色的用户-->
+	<select id="queryAllUnAuthUserByRoleId" parameterType="map" resultType="com.qty.entity.SysUser">
+		select tu.* from tb_users tu
+		left join tb_dept td on tu.dept_id = td.dept_id
+		left join tb_user_role tur on tu.user_id = tur.user_id
+		left join tb_role tr on tr.role_id = tur.role_id
+		where tu.del_flag = '0' and (tr.role_id != #{roleId} or tr.role_id IS NULL)
+		and tu.user_id not in (select u.user_id from tb_user u inner join tb_user_role ur on u.user_id = ur.user_id and ur.role_id = #{roleId})
+		<if test="search != null and search != ''">
+			AND (tu.user_name like concat('%', #{search},'%') or tu.user_nickname like concat('%', #{search}, '%'))
+		</if>
+		${dataScope}
+		limit #{page},#{limit}
+	</select>
+
+	<select id="queryAllUnAuthUserCountByRoleId" parameterType="map" resultType="int">
+		select count(*) from tb_users tu
+		left join tb_dept td on tu.dept_id = td.dept_id
+		left join tb_user_role tur on tu.user_id = tur.user_id
+		left join tb_role tr on tr.role_id = tur.role_id
+		where tu.del_flag = '0' and (tr.role_id != #{roleId} or tr.role_id IS NULL)
+		and tu.user_id not in (select u.user_id from tb_user u inner join tb_user_role ur on u.user_id = ur.user_id and ur.role_id = #{roleId})
+		<if test="search != null and search != ''">
+			AND (tu.user_name like concat('%', #{search},'%') or tu.user_nickname like concat('%', #{search}, '%'))
+		</if>
+		${dataScope}
+	</select>
+
+</mapper>

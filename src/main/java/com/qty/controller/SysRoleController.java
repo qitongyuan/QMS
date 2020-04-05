@@ -201,7 +201,24 @@ public class SysRoleController {
     public BaseResponse getAuthUsers(@RequestBody Map<String,Object>params){
         BaseResponse response=new BaseResponse(StatusCode.Success);
         try {
-            PageUtil page=sysUserService.queryPageByRoleId(params);
+            PageUtil page=sysUserService.queryPageAuthByRoleId(params);
+            response.setData(page);
+        } catch (Exception e) {
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        return response;
+    }
+
+    /**
+     * 牵扯到数据权限，是否可以看到所有人的数据（或者只能看到自定义的数据权限）
+     * @return
+     */
+    @ApiOperation(value = "查看尚未分配的用户列表", notes = "查看尚未分配的用户列表")
+    @PostMapping("/getUnAuthUsers")
+    public BaseResponse getUnAuthUsers(@RequestBody Map<String,Object>params){
+        BaseResponse response=new BaseResponse(StatusCode.Success);
+        try {
+            PageUtil page=sysUserService.queryPageUnAuthByRoleId(params);
             response.setData(page);
         } catch (Exception e) {
             response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());

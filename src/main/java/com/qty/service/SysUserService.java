@@ -26,5 +26,8 @@ public interface SysUserService extends IService<SysUser> {
     //--------------------------以上均为登录必须
 
     //分页查询已授权的用户
-    PageUtil queryPageByRoleId(Map<String,Object> params);
+    PageUtil queryPageAuthByRoleId(Map<String,Object> params);
+
+    //分页查询还未授权的用户
+    PageUtil queryPageUnAuthByRoleId(Map<String,Object>params);
 }
