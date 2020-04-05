@@ -4,6 +4,7 @@ import com.qty.entity.SysRole;
 import com.qty.response.BaseResponse;
 import com.qty.response.StatusCode;
 import com.qty.service.SysRoleService;
+import com.qty.service.SysUserService;
 import com.qty.util.PageUtil;
 import com.qty.util.ValidatorUtil;
 import io.swagger.annotations.Api;
@@ -29,6 +30,8 @@ public class SysRoleController {
 
     private SysRoleService sysRoleService;
 
+    private SysUserService sysUserService;
+
     //此处策略改变，取详情数据时由前端来操作
     @ApiOperation(value = "角色列表展示", notes = "部门列表展示")
     @PostMapping("/list")
@@ -42,8 +45,6 @@ public class SysRoleController {
         }
         return response;
     }
-
-    //ToDO 角色的增删改
 
     /**
      * 新增角色，在角色新增的同时维护进菜单信息
@@ -83,7 +84,7 @@ public class SysRoleController {
      */
     @ApiOperation(value = "编辑角色与菜单权限", notes = "编辑角色与菜单权限")
     @PostMapping("/update")
-    public BaseResponse updateRole(@Validated SysRole role,BindingResult result){
+    public BaseResponse updateRole(@RequestBody @Validated SysRole role,BindingResult result){
         //不允许操作超级管理的角色
         sysRoleService.checkRoleAllowed(role);
         BaseResponse response=new BaseResponse(StatusCode.Success);
@@ -133,7 +134,7 @@ public class SysRoleController {
      */
     @ApiOperation(value = "编辑角色数据权限", notes = "编辑角色数据权限")
     @PostMapping("/authDataScope")
-    public BaseResponse authDataScopeSave(SysRole role){
+    public BaseResponse authDataScopeSave(@RequestBody SysRole role){
         BaseResponse response=new BaseResponse(StatusCode.Success);
         //检验是否为超管用户，超管用户不能分配数据权限
         sysRoleService.checkRoleAllowed(role);
@@ -147,6 +148,68 @@ public class SysRoleController {
         }
         return response;
     }
+
+
+    /**
+     * 授权角色到用户
+     * @return
+     */
+    @ApiOperation(value = "授权用户", notes = "授权用户")
+    @PostMapping("/authRole")
+    public BaseResponse authUser(Long roleId,String userIds){
+        BaseResponse response=new BaseResponse(StatusCode.Success);
+        //只用维护一张中间表角色用户中间表
+        try {
+            int rows=sysRoleService.insertAuthUsers(roleId,userIds);
+            if (rows<1){
+                throw new RuntimeException("授权失败");
+            }
+        } catch (Exception e) {
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        return response;
+    }
+
+    /**
+     * 暂不做批量取消授权
+     * @param roleId
+     * @param userId
+     * @return
+     */
+    @ApiOperation(value = "取消授权用户", notes = "取消授权用户")
+    @PostMapping("/unAuthRole")
+    public BaseResponse unAuthUser(Long roleId,Long userId){
+        BaseResponse response=new BaseResponse(StatusCode.Success);
+        //只用维护一张中间表角色用户中间表
+        try {
+            int rows=sysRoleService.deleteAuthUser(roleId,userId);
+            if (rows<1){
+                throw new RuntimeException("取消授权失败");
+            }
+        } catch (Exception e) {
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        return response;
+    }
+
+    /**
+     * 牵扯到数据权限，是否可以看到所有人的数据（或者只能看到自定义的数据权限）
+     * @return
+     */
+    @ApiOperation(value = "查看已授权用户", notes = "查看已授权用户")
+    @PostMapping("/getAuthUsers")
+    public BaseResponse getAuthUsers(@RequestBody Map<String,Object>params){
+        BaseResponse response=new BaseResponse(StatusCode.Success);
+        try {
+            PageUtil page=sysUserService.queryPageByRoleId(params);
+            response.setData(page);
+        } catch (Exception e) {
+            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        return response;
+    }
+
+
 
 }
 

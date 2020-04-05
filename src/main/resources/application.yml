@@ -25,5 +25,5 @@ spring:
 mybatis-plus:
   type-aliases-package: com.qty.entity
   mapper-locations: classpath:mappers/*.xml
-configuration:
-                log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

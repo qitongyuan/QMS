@@ -2,6 +2,7 @@ package com.qty.aspect;
 
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.qty.annotation.DataScope;
 import com.qty.entity.BaseEntity;
 import com.qty.entity.SysRole;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 
 @Aspect
 @Component
@@ -172,9 +174,18 @@ public class DataScopeAspect {
 
         if (StringUtils.isNotBlank(sqlString.toString()))
         {
-            //如果拼接不为空则直接set进实体类
-            BaseEntity baseEntity = (BaseEntity) joinPoint.getArgs()[0];
-            baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
+            //分两种方式，要么在实体类中用，要么分页时直接用
+            try {
+                //方式一：
+                //如果拼接不为空则直接set进实体类
+                BaseEntity baseEntity = (BaseEntity) joinPoint.getArgs()[0];
+                baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
+            } catch (Exception e) {
+                //方式二:
+                //方便分页直接在入参中put一个键值对
+                Map<String, Object> params= (Map<String, Object>) joinPoint.getArgs()[0];
+                params.put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
+            }
         }
     }
 }

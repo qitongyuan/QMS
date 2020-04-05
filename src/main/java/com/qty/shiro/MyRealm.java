@@ -5,7 +5,7 @@ package com.qty.shiro;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.qty.entity.SysUser;
-import com.qty.mapper.UserMapper;
+import com.qty.mapper.SysUserMapper;
 import com.qty.util.ConstantParameter;
 import com.qty.util.JwtRedisUtil;
 import io.jsonwebtoken.Claims;
@@ -44,7 +44,7 @@ public class MyRealm extends AuthorizingRealm {
     private StringRedisTemplate stringRedisTemplate;
 
     @Resource
-    private UserMapper userMapper;
+    private SysUserMapper sysUserMapper;
 
 
     /**
@@ -70,9 +70,9 @@ public class MyRealm extends AuthorizingRealm {
         //查询权限集合赋给shiro
         List<String>roles=Lists.newLinkedList();
         List<String>perms= Lists.newLinkedList();
-        roles=userMapper.queryAllRoles(sysUser.getUserId());
+        roles= sysUserMapper.queryAllRoles(sysUser.getUserId());
         //在数据库中关联查询该用户的权限集合
-        perms=userMapper.queryAllPerms(sysUser.getUserId());
+        perms= sysUserMapper.queryAllPerms(sysUser.getUserId());
         //对于每一个授权编码进行 , 的解析拆分
         Set<String> stringPermissions= Sets.newHashSet();
         if (perms!=null && !perms.isEmpty()){

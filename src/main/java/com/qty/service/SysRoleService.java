@@ -32,4 +32,10 @@ public interface SysRoleService extends IService<SysRole> {
 
     //赋予数据权限
     public boolean authDataScope(SysRole role);
+
+    //批量授权到用户
+    public int insertAuthUsers(Long roleId,String userIds);
+
+    //取消授权
+    public int deleteAuthUser(Long roleId,Long userId);
 }

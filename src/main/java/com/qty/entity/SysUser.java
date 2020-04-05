@@ -17,7 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 @TableName(value = "tb_users")
-public class SysUser implements Serializable {
+public class SysUser extends BaseEntity implements Serializable {
 
     @TableId(value = "user_id",type = IdType.AUTO)
     private Long userId;

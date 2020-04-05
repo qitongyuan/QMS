@@ -1,14 +1,18 @@
 package com.qty.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.qty.annotation.DataScope;
 import com.qty.entity.SysUser;
 import com.qty.entity.vo.UpdatePsdVo;
-import com.qty.mapper.UserMapper;
+import com.qty.mapper.SysUserMapper;
 import com.qty.service.SysUserService;
 import com.qty.shiro.ShiroUtil;
 import com.qty.util.ConstantParameter;
 import com.qty.util.JwtRedisUtil;
+import com.qty.util.PageUtil;
+import com.qty.util.QueryUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -21,6 +25,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author qty
@@ -28,10 +34,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Slf4j
 @Service
-public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements SysUserService {
+public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
 
     @Resource
-    private UserMapper userMapper;
+    private SysUserMapper sysUserMapper;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -44,7 +50,7 @@ public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser> impleme
         }
         QueryWrapper<SysUser> wrapper=new QueryWrapper<>();
         wrapper.eq("user_name",userName);
-        SysUser sysUser =userMapper.selectOne(wrapper);
+        SysUser sysUser = sysUserMapper.selectOne(wrapper);
         if (sysUser ==null){
             throw new RuntimeException("当前用户不存在！");
         }
@@ -63,7 +69,7 @@ public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser> impleme
         QueryWrapper<SysUser>wrapper=new QueryWrapper<>();
         wrapper.eq("user_id", sysUser.getUserId());
         wrapper.eq("user_name", sysUser.getUserName());
-        SysUser sysUserInDb = userMapper.selectOne(wrapper);
+        SysUser sysUserInDb = sysUserMapper.selectOne(wrapper);
         if (sysUserInDb ==null){
             throw new RuntimeException("当前Token对应的是无效的用户！");
         }
@@ -71,7 +77,7 @@ public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser> impleme
             throw new RuntimeException("旧密码不匹配！");
         }
         sysUserInDb.setUserPassword(updatePsdVo.getNewPassword());
-        int res=userMapper.updateById(sysUserInDb);
+        int res= sysUserMapper.updateById(sysUserInDb);
         if (res<=0){
             throw new RuntimeException("修改密码失败~请重新尝试或者联系管理员！");
         }
@@ -92,5 +98,30 @@ public class SysUserServiceImpl extends ServiceImpl<UserMapper, SysUser> impleme
                 stringRedisTemplate.delete(key);
             }
         }
+    }
+
+    //分页查找已授权的用户
+    //分配权限的人员列表必须是该用户能够看到的人
+    //还要求分页
+    @Override
+    @DataScope(deptAlias = "td",userAlias = "tu")
+    public PageUtil queryPageByRoleId(Map<String, Object> params) {
+        //搜索框
+        String search= (params.get("search") == null)? "": params.get("search").toString();
+        params.put("search",search);
+        //角色ID
+        Long roleId=(params.get("roleId") == null)? -1L: Long.parseLong(params.get("roleId").toString());
+        params.put("roleId",roleId);
+        //取当前页
+        int currPage=(params.get("page") == null)? 1: Integer.parseInt(params.get("page").toString());
+        params.put("page",currPage-1);
+        //取页容量
+        int pageSize=(params.get("limit") == null)? 10: Integer.parseInt(params.get("limit").toString());
+        params.put("limit",pageSize);
+        //查询满足条件和分页的所有数据
+        List<SysUser>sysUsers= sysUserMapper.queryAllAuthUserByRoleId(params);
+        //查询满足条件的记录数
+        int countAll=sysUserMapper.queryAllAuthUserCountByRoleId(params);
+        return new PageUtil(sysUsers,countAll,pageSize,currPage);
     }
 }

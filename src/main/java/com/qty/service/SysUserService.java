@@ -3,6 +3,9 @@ package com.qty.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.qty.entity.SysUser;
 import com.qty.entity.vo.UpdatePsdVo;
+import com.qty.util.PageUtil;
+
+import java.util.Map;
 
 
 /**
@@ -19,4 +22,9 @@ public interface SysUserService extends IService<SysUser> {
 
     //注销redis中的token
     public void invalidateByAccessToken(final String accessToken) throws Exception;
+
+    //--------------------------以上均为登录必须
+
+    //分页查询已授权的用户
+    PageUtil queryPageByRoleId(Map<String,Object> params);
 }

@@ -7,9 +7,11 @@ import com.google.common.collect.Lists;
 import com.qty.entity.SysRole;
 import com.qty.entity.SysRoleDept;
 import com.qty.entity.SysRoleMenu;
+import com.qty.entity.SysUserRole;
 import com.qty.mapper.SysRoleDeptMapper;
 import com.qty.mapper.SysRoleMapper;
 import com.qty.mapper.SysRoleMenuMapper;
+import com.qty.mapper.SysUserRoleMapper;
 import com.qty.service.SysRoleService;
 import com.qty.util.PageUtil;
 import com.qty.util.QueryUtil;
@@ -35,6 +37,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper,SysRole> imple
 
     @Resource
     private SysRoleDeptMapper sysRoleDeptMapper;
+
+    @Resource
+    private SysUserRoleMapper sysUserRoleMapper;
 
     @Override
     public List<SysRole> getRolesById(Long userId) {
@@ -182,5 +187,23 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper,SysRole> imple
         }else {
             return false;
         }
+    }
+
+    @Override
+    public int insertAuthUsers(Long roleId, String userIds) {
+        String[] users=userIds.split(",");
+        List<SysUserRole>list=Lists.newArrayList();
+        for (String userId:users) {
+            SysUserRole userRole=new SysUserRole();
+            userRole.setUserId(Long.parseLong(userId));
+            userRole.setRoleId(roleId);
+            list.add(userRole);
+        }
+        return sysUserRoleMapper.insertBatch(list);
+    }
+
+    @Override
+    public int deleteAuthUser(Long roleId, Long userId) {
+        return sysUserRoleMapper.deleteUserRole(roleId, userId);
     }
 }

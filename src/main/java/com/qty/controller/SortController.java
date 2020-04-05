@@ -62,7 +62,7 @@ public class SortController {
 
     //根据ID查询分类
     @ApiOperation(value="根据ID查询分类",notes="根据ID查询分类")
-    @RequiresPermissions("sort:manage:getone")
+//    @RequiresPermissions("sort:manage:getone")
     @GetMapping(value = "/manage/getOne")
     public BaseResponse<Sort> getById(@RequestParam Long id){
         BaseResponse response=new BaseResponse(StatusCode.Success);
@@ -91,7 +91,7 @@ public class SortController {
 
     //分页展示分类（分类不分级别）
     @ApiOperation(value="分页展示分类",notes="分页展示分类")
-    @RequiresPermissions("sort:manage:list")
+//    @RequiresPermissions("sort:manage:list")
 //    @RequiresRoles(value={"管理员"})
     @PostMapping(value = "/manage/list")
     public BaseResponse list(@RequestBody Map<String,Object> params){

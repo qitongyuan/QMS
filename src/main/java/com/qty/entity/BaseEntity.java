@@ -1,5 +1,6 @@
 package com.qty.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,6 +18,7 @@ public class BaseEntity implements Serializable {
     /**
      * 拼接用参数，目前主要用于拼接数据权限所需sql
      */
+    @TableField(exist=false)
     private Map<String, Object> params;
 
     //get方法需要重写
