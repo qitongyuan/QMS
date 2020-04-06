@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qty.mapper.SysMenuMapper">
+
+    <select id="queryAllMenu" parameterType="com.qty.entity.SysMenu" resultType="com.qty.entity.SysMenu">
+        select * from tb_menu tm
+        <where>
+            <if test="name != null and name != ''">
+                AND tm.name like concat('%', #{menuName}, '%')
+            </if>
+        </where>
+        order by parent_id, order_num
+    </select>
+
+    <select id="queryMenuByUserId" resultType="com.qty.entity.SysMenu">
+        select * from  tb_menu tm
+            left join tb_role_menu trm on tm.menu_id=trm.menu_id
+            left join tb_user_role tur on trm.role_id=tur.role_id
+            left join tb_role tr on tr.role_id=tur.role_id
+                where tur.user_id=#{userId}
+        <if test="menu.name != null and menu.name != ''">
+            AND tm.name like concat('%', #{menu.name}, '%')
+        </if>
+        order by tm.parent_id,tm.order_num
+    </select>
+
+    <select id="selectCountRoleMenuId" parameterType="long" resultType="int">
+        select count(1) from tb_role_menu where menu_id=#{menuId}
+    </select>
+    
+    <select id="selectCountMenuByParentId" parameterType="long" resultType="int">
+        select count(1) from tb_menu where parent_id=#{menuId}
+    </select>
+
+    <select id="checkMenuNameRepeat" resultType="int">
+        select count(1) from name=#{menuName} and parent_id=#{parentId}
+    </select>
+
+    <select id="selectRoleMenuByRoleId" parameterType="long" resultType="long">
+        select m.menu_id
+		from t_menu m
+			left join t_role_menu rm on m.menu_id = rm.menu_id
+		where rm.role_id = #{roleId}
+		order by m.parent_id, m.order_num
+    </select>
+
+
+</mapper>

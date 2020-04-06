@@ -3,6 +3,8 @@ package com.qty.controller;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.qty.entity.SysDept;
+import com.qty.entity.SysRole;
+import com.qty.entity.Ztree;
 import com.qty.response.BaseResponse;
 import com.qty.response.StatusCode;
 import com.qty.service.SysDeptService;
@@ -26,6 +28,11 @@ public class SysDeptController {
 
     private SysDeptService sysDeptService;
 
+
+    //TODO 少一个接口获取真正的部门树（在新增时后用）参考若依的/treeData
+    //TODO 少一个已勾选的接口
+    //todo 全部前端转树形结构
+
     @ApiOperation(value = "部门列表展示(带5种权限)", notes = "部门列表展示(带5种权限)")
     @PostMapping("/deptList")
     public BaseResponse deptList(@RequestBody SysDept sysDept){
@@ -40,19 +47,34 @@ public class SysDeptController {
         return response;
     }
 
-    @ApiOperation(value = "部门树勾选数据", notes = "部门树勾选数据")
-    @GetMapping("/roleDeptData")
-    public BaseResponse getRoleDept(@RequestParam Long roleId){
-        BaseResponse response=new BaseResponse(StatusCode.Success);
-        List<Long>deptIds=Lists.newArrayList();
-        try {
-            deptIds=sysDeptService.roleDeptData(roleId);
-        }catch (Exception e){
-            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
-        }
-        response.setData(deptIds);
-        return response;
+    //在角色管理中新增角色时加载的部门树
+    @ApiOperation(value = "在角色管理中新增角色时加载的部门树", notes = "在角色管理中新增角色时加载的部门树")
+    @GetMapping("/roleDeptTreeData")
+    public List<Ztree> roleDeptTreeData(SysRole role){
+        List<Ztree>sysDepts= sysDeptService.roleDeptTreeData(role);
+        return sysDepts;
     }
+
+    @ApiOperation(value = "在部门管理中新增部门时加载的部门树", notes = "在部门管理中新增部门时加载的部门树")
+    @GetMapping("/deptTreeData")
+    public List<Ztree> deptTreeData(){
+        List<Ztree>sysDepts= sysDeptService.selectDeptListTree(new SysDept());
+        return sysDepts;
+    }
+
+//    @ApiOperation(value = "部门树勾选数据", notes = "部门树勾选数据")
+//    @GetMapping("/roleDeptData")
+//    public BaseResponse getRoleDept(@RequestParam Long roleId){
+//        BaseResponse response=new BaseResponse(StatusCode.Success);
+//        List<Long>deptIds=Lists.newArrayList();
+//        try {
+//            deptIds=sysDeptService.roleDeptData(roleId);
+//        }catch (Exception e){
+//            response=new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+//        }
+//        response.setData(deptIds);
+//        return response;
+//    }
 
     @ApiOperation(value = "部门新增", notes = "部门新增")
     @PostMapping(value = "/save")

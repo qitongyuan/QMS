@@ -6,7 +6,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.qty.annotation.DataScope;
 import com.qty.entity.SysDept;
+import com.qty.entity.SysRole;
 import com.qty.entity.SysUser;
+import com.qty.entity.Ztree;
 import com.qty.mapper.SysDeptMapper;
 import com.qty.service.SysDeptService;
 import com.qty.shiro.ShiroUtil;
@@ -66,8 +68,60 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         return sysDeptMapper.selectDeptList(dept);
     }
 
+    @DataScope(deptAlias = "td")
+    @Override
+    public List<Ztree> selectDeptListTree(SysDept dept) {
+        List<SysDept>deptList=sysDeptMapper.selectDeptList(dept);
+        List<Ztree>ztrees=initZtree(deptList);
+        return ztrees;
+    }
+
     @Override
     public List<Long> roleDeptData(Long roleId) {
         return sysDeptMapper.selectRoleDeptById(roleId);
+    }
+
+    @Override
+    public List<Ztree> roleDeptTreeData(SysRole role) {
+        Long roleId=role.getRoleId();
+        List<Ztree>ztrees=Lists.newArrayList();
+        //获取部门列表
+        List<SysDept>depts=this.selectDeptList(new SysDept());
+        if (com.qty.util.StringUtils.isNotNull(roleId)){
+            List<Long>deptIds=sysDeptMapper.selectRoleDeptById(roleId);
+            ztrees=initZtree(depts,deptIds);
+        }else {
+            ztrees=initZtree(depts);
+        }
+        return ztrees;
+    }
+
+    public List<Ztree> initZtree(List<SysDept> deptList)
+    {
+        return initZtree(deptList, null);
+    }
+
+    /**
+     * 将勾选的数据统一转化为树结构
+     * @param deptList
+     * @param deptIds
+     * @return
+     */
+    public List<Ztree> initZtree(List<SysDept> deptList, List<Long> deptIds){
+        List<Ztree> ztrees=Lists.newArrayList();
+        //是否有被勾选的数据
+        boolean isCheck=com.qty.util.StringUtils.isNotNull(deptIds);
+        for (SysDept d:deptList) {
+            Ztree z=new Ztree();
+            z.setId(d.getDeptId());
+            z.setPId(d.getParentId());
+            z.setName(d.getName());
+            z.setTitle(d.getName());
+            if (isCheck){
+                z.setChecked(deptIds.contains(d.getDeptId()));
+            }
+            ztrees.add(z);
+        }
+        return ztrees;
     }
 }

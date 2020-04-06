@@ -54,7 +54,7 @@
         from tb_dept td as td
         left join tb_role_dept as trd on trd.dept_id=td.dept_id
         where trd.role_id=#{roleId}
-        order by td.dept_id
+        order by td.parent_id,td.order_num
     </select>
 
 </mapper>
