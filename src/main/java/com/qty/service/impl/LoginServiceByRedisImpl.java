@@ -45,7 +45,7 @@ public class LoginServiceByRedisImpl implements LoginServiceByRedis {
             //将token存入到redis中设置过期时间
             valueOperations.set(ConstantParameter.JWT_TOKEN_REDIS_KEY_PREFIX+ sysUser.getUserId(),accessToken,ConstantParameter.ACCESS_TOKEN_EXPIRE, TimeUnit.MILLISECONDS);
             log.info("--jwt+redis用户认证成功，成功生成accessToken--");
-            AuthTokenVo tokenModel=new AuthTokenVo(accessToken,ConstantParameter.ACCESS_TOKEN_EXPIRE, sysUser.getUserName(), sysUser.getUserEmail(), sysUser.getUserTelephoneNumber());
+            AuthTokenVo tokenModel=new AuthTokenVo(accessToken,ConstantParameter.ACCESS_TOKEN_EXPIRE, sysUser.getUserName(), sysUser.getUserEmail(), sysUser.getUserTelephoneNumber(),sysUser.getTenantId());
             return tokenModel;
         }
         //如果获取不到返回空

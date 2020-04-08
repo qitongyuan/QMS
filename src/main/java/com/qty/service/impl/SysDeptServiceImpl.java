@@ -62,6 +62,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         }
     }
 
+    //查询部门管理列表
     @DataScope(deptAlias = "td")
     @Override
     public List<SysDept> selectDeptList(SysDept dept) {

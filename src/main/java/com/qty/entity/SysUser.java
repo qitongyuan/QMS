@@ -48,5 +48,8 @@ public class SysUser extends BaseEntity implements Serializable {
 
     private Long deptId;
 
+    //租户id
+    private String tenantId;
+
 
 }
