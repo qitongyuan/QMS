@@ -12,7 +12,7 @@ spring:
   cache:
     type: redis
   redis:
-    host: 119.23.109.216
+    host: 47.103.201.92
     port: 6379
     jedis:
       pool:
